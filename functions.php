@@ -27,20 +27,57 @@
 
 
 
-// changing default wordpres email settings 
- 
-		add_filter('wp_mail_from', 'new_mail_from');
-		add_filter('wp_mail_from_name', 'new_mail_from_name');
 
-		function new_mail_from($old) {
-			 return 'info@engage-online.com';
-		}
+// remove personal options block
 
-		function new_mail_from_name($old) {
-			 return 'Engage Demo';
-		}    
-    
+if(is_admin()){
+  remove_action( 'admin_color_scheme_picker', 'admin_color_scheme_picker' );
+  add_action( 'personal_options', 'prefix_hide_personal_options' );
+}
+function prefix_hide_personal_options() {
+?>
+<script type="text/javascript">
+  jQuery(document).ready(function( $ ){
+    $("#your-profile .form-table:first, #your-profile h3:first, .form-table:last, h3:last").remove();
+    $("#nickname,#display_name").parent().parent().remove();
+  });
+</script>
+<?php
+}
 
+
+
+//Remove tags metabox from Posts
+
+
+function engage_remove_tags_metabox() {
+	remove_meta_box( 'tagsdiv-post_tag' , 'post' , 'normal' ); 
+}
+add_action( 'admin_menu' , 'engage_remove_tags_metabox' );
+
+
+
+// remove aim, jabber and yim
+add_filter( 'user_contactmethods', 'update_contact_methods',10,1);
+
+function update_contact_methods( $contactmethods ) {
+
+unset($contactmethods['aim']);  
+unset($contactmethods['jabber']);  
+unset($contactmethods['yim']);  
+
+
+return $contactmethods;
+}
+
+
+// custom admin login logo
+function custom_login_logo() {
+	echo '<style type="text/css">
+	h1 a { background-image: url(wp-content/themes/engage-child/images/login-logo.png) !important; background-size: 150px 150px!important; height: 150px!important; width: 150px!important;}
+	</style>';
+}
+add_action('login_head', 'custom_login_logo');
 
 
 /*   ====================================================================================================================
